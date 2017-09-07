@@ -7,4 +7,4 @@ WORKDIR /opt/etherpad-lite
 ENV HOME=/opt/etherpad-lite
 ADD . /opt/etherpad-lite
 EXPOSE 9001
-CMD ["./start.sh"]
+CMD ["/opt/etherpad-lite/start.sh"]
