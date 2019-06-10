@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openshift-etherpad
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: openshift-etherpad
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: openshift-etherpad
+        deploymentconfig: openshift-etherpad
+    spec:
+      containers:
+      - image: docker-registry.default.svc:5000/etherpad/openshift-etherpad
+        imagePullPolicy: Always
+        name: openshift-etherpad
+        ports:
+        - containerPort: 9001
+          protocol: TCP
+        resources:
+            limits:
+                cpu: "1"
+                memory: "1Gi"
+            requests:
+                cpu: "1"
+                memory: "1Gi"
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /opt/etherpad-lite/var
+          name: volume-etherpad-db
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: volume-etherpad-db
+        persistentVolumeClaim:
+          claimName: etherpad-db
+  test: false
